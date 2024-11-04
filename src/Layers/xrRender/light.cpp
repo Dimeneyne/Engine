@@ -360,13 +360,17 @@ void	light::set_attenuation_params	(float a0, float a1, float a2, float fo)
 
 #endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
 
-extern float		r_ssaGLOD_start,	r_ssaGLOD_end;
-extern float		ps_r2_slight_fade;
-float	light::get_LOD					()
+extern float r_ssaGLOD_start;
+extern float r_ssaGLOD_end;
+extern float ps_r2_slight_fade;
+
+float light::get_LOD()
 {
-	if	(!flags.bShadow)	return 1;
-	float	distSQ			= Device.camera.position.distance_to_sqr(spatial.sphere.P)+EPS;
-	float	ssa				= ps_r2_slight_fade * spatial.sphere.R/distSQ;
-	float	lod				= _sqrt(clampr((ssa - r_ssaGLOD_end)/(r_ssaGLOD_start-r_ssaGLOD_end),0.f,1.f));
-	return	lod	;
+	if (!flags.bShadow)
+		return 1;
+
+	float distSQ						= Device.camera.position.distance_to_sqr(spatial.sphere.P) + EPS;
+	float fade							= (Device.SVP.isRendering()) ? 0.f : ps_r2_slight_fade;
+	float ssa							= fade * spatial.sphere.R / distSQ;
+	return								_sqrt(clampr((ssa - r_ssaGLOD_end) / (r_ssaGLOD_start - r_ssaGLOD_end), 0.f, 1.f));
 }

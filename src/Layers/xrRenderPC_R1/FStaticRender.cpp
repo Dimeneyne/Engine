@@ -360,9 +360,12 @@ void CRender::Calculate				()
 	Device.Statistic->RenderCALC.Begin();
 
 	// Transfer to global space to avoid deep pointer access
-	IRender_Target* T				=	getTarget	();
-	float	fov_factor				=	_sqr		(90.f / Device.camera.fov);
-	g_fSCREEN						=	float(T->get_width()*T->get_height())*fov_factor*(EPS_S+ps_r__LOD);
+	IRender_Target* T				= getTarget();
+	float fov_factor				= _sqr(90.f / Device.camera.fov);
+	float lod_factor				= EPS_S;
+	if (!Device.SVP.isRendering())
+		lod_factor					+= ps_r__LOD;
+	g_fSCREEN						= static_cast<float>(T->get_width() * T->get_height()) * fov_factor * lod_factor;
 	r_ssaDISCARD					=	_sqr(ps_r__ssaDISCARD)		/g_fSCREEN;
 	r_ssaDONTSORT					=	_sqr(ps_r__ssaDONTSORT/3)	/g_fSCREEN;
 	r_ssaLOD_A						=	_sqr(ps_r1_ssaLOD_A/3)		/g_fSCREEN;

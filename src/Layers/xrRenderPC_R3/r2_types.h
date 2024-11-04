@@ -98,7 +98,12 @@ const		u32					LUMINANCE_size		= 16	;
 //	For rain R3 rendering
 #define		SE_SUN_RAIN_SMAP	5
 
-extern		float	ps_r2_gloss_factor;
-IC	float	u_diffuse2s	(float x, float y, float z)	{ float	v = (x+y+z)/3.f;	return ps_r2_gloss_factor * ((v<1)?powf(v,2.f/3.f):v); }
-IC	float	u_diffuse2s	(Fvector3& c)				{ return u_diffuse2s(c.x,c.y,c.z);					}
+extern float							ps_r2_gloss_factor;
+IC float								u_diffuse2s								(float x, float y, float z)
+{
+	float v								= (x + y + z) / 3.f;
+	float gloss_factor					= (Device.SVP.isRendering()) ? 0.f : ps_r2_gloss_factor;
+	return								gloss_factor * ((v < 1) ? powf(v, 2.f / 3.f) : v);
+}
 
+IC float								u_diffuse2s								(Fvector3 CR$ c)		{ return u_diffuse2s(c.x, c.y, c.z); }

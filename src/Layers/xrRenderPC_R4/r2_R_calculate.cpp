@@ -11,20 +11,21 @@ extern float		r_ssaLOD_B		;
 extern float		r_ssaHZBvsTEX	;
 extern float		r_ssaGLOD_start,	r_ssaGLOD_end;
 
-void CRender::Calculate		()
+void CRender::Calculate()
 {
 	// Transfer to global space to avoid deep pointer access
-	IRender_Target* T				=	getTarget	();
-	float	fov_factor				=	_sqr		(90.f / Device.camera.fov);
-	g_fSCREEN						=	float(T->get_width()*T->get_height())*fov_factor*(EPS_S+ps_r__LOD);
-	r_ssaDISCARD					=	_sqr(ps_r__ssaDISCARD)		/g_fSCREEN;
-	r_ssaDONTSORT					=	_sqr(ps_r__ssaDONTSORT/3)	/g_fSCREEN;
-	r_ssaLOD_A						=	_sqr(ps_r2_ssaLOD_A/3)		/g_fSCREEN;
-	r_ssaLOD_B						=	_sqr(ps_r2_ssaLOD_B/3)		/g_fSCREEN;
-	r_ssaGLOD_start					=	_sqr(ps_r__GLOD_ssa_start/3)/g_fSCREEN;
-	r_ssaGLOD_end					=	_sqr(ps_r__GLOD_ssa_end/3)	/g_fSCREEN;
-	r_ssaHZBvsTEX					=	_sqr(ps_r__ssaHZBvsTEX/3)	/g_fSCREEN;
-	r_dtex_range					=	ps_r2_df_parallax_range * g_fSCREEN / (1024.f * 768.f);
+	IRender_Target* T					= getTarget();
+	float fov_factor					= _sqr(90.f / Device.camera.fov);
+	float lod_factor					= (Device.SVP.isRendering()) ? .1f : ps_r__LOD;
+	g_fSCREEN							= static_cast<float>(T->get_width() * T->get_height()) * fov_factor * lod_factor;
+	r_ssaDISCARD						= _sqr(ps_r__ssaDISCARD)		/ g_fSCREEN;
+	r_ssaDONTSORT						= _sqr(ps_r__ssaDONTSORT/3)		/ g_fSCREEN;
+	r_ssaLOD_A							= _sqr(ps_r2_ssaLOD_A/3)		/ g_fSCREEN;
+	r_ssaLOD_B							= _sqr(ps_r2_ssaLOD_B/3)		/ g_fSCREEN;
+	r_ssaGLOD_start						= _sqr(ps_r__GLOD_ssa_start/3)	/ g_fSCREEN;
+	r_ssaGLOD_end						= _sqr(ps_r__GLOD_ssa_end/3)	/ g_fSCREEN;
+	r_ssaHZBvsTEX						= _sqr(ps_r__ssaHZBvsTEX/3)		/ g_fSCREEN;
+	r_dtex_range						= ps_r2_df_parallax_range		* g_fSCREEN / (1024.f * 768.f);
 	
 	// Detect camera-sector
 	if (!vLastCameraPos.similar(Device.camera.position,EPS_S)) 
