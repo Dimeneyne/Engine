@@ -28,8 +28,6 @@ static const float		OPTIMIZATION_DISTANCE		= 100.f;
 
 static bool stalker_use_dynamic_lights	= false;
 
-ENGINE_API int g_current_renderer;
-
 CTorch::CTorch(void) 
 {
 	light_render				= ::Render->light_create();
@@ -47,14 +45,6 @@ CTorch::CTorch(void)
 	m_prev_hp.set				(0,0);
 	m_delta_h					= 0;
 	m_night_vision				= NULL;
-
-	// Disabling shift by x and z axes for 1st render, 
-	// because we don't have dynamic lighting in it. 
-	if( g_current_renderer == 1 )
-	{
-		TORCH_OFFSET.x = 0;
-		TORCH_OFFSET.z = 0;
-	}
 }
 
 CTorch::~CTorch() 
@@ -209,10 +199,6 @@ BOOL CTorch::net_Spawn(CSE_Abstract* DC)
 
 	if (!inherited::net_Spawn(DC))
 		return				(FALSE);
-	
-	bool b_r2				= !!psDeviceFlags.test(rsR2);
-	b_r2					|= !!psDeviceFlags.test(rsR3);
-	b_r2					|= !!psDeviceFlags.test(rsR4); //Alundaio
 
 	IKinematics* K			= smart_cast<IKinematics*>(Visual());
 	CInifile* pUserData		= K->LL_UserData(); 
@@ -220,14 +206,14 @@ BOOL CTorch::net_Spawn(CSE_Abstract* DC)
 	lanim					= LALib.FindItem(pUserData->r_string("torch_definition","color_animator"));
 	guid_bone				= K->LL_BoneID	(pUserData->r_string("torch_definition","guide_bone"));	VERIFY(guid_bone!=BI_NONE);
 
-	Fcolor clr				= pUserData->r_fcolor				("torch_definition",(b_r2)?"color_r2":"color");
+	Fcolor clr				= pUserData->r_fcolor				("torch_definition", "color");
 	fBrightness				= clr.intensity();
-	float range				= pUserData->r_float				("torch_definition",(b_r2)?"range_r2":"range");
+	float range				= pUserData->r_float				("torch_definition", "range");
 	light_render->set_color	(clr);
 	light_render->set_range	(range);
 
-	Fcolor clr_o			= pUserData->r_fcolor				("torch_definition",(b_r2)?"omni_color_r2":"omni_color");
-	float range_o			= pUserData->r_float				("torch_definition",(b_r2)?"omni_range_r2":"omni_range");
+	Fcolor clr_o			= pUserData->r_fcolor				("torch_definition", "omni_color");
+	float range_o			= pUserData->r_float				("torch_definition", "omni_range");
 	light_omni->set_color	(clr_o);
 	light_omni->set_range	(range_o);
 

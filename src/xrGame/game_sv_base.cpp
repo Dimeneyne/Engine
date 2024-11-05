@@ -459,7 +459,6 @@ void game_sv_GameState::Create					(shared_str &options)
 	//---------------------------------------------------------------------
 	ConsoleCommands_Create();
 	//---------------------------------------------------------------------
-//	CCC_LoadCFG_custom*	pTmp = xr_new<CCC_LoadCFG_custom>("sv_");
 //	pTmp->Execute				(Console->ConfigFile);
 //	xr_delete					(pTmp);
 	//---------------------------------------------------------------------

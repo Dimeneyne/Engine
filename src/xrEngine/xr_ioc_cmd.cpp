@@ -15,14 +15,13 @@
 
 #include "xr_object.h"
 
-xr_token* vid_quality_token = NULL;
-
 xr_token vid_bpp_token[] =
 {
 	{"16", 16},
 	{"32", 32},
 	{0, 0}
 };
+
 //-----------------------------------------------------------------------
 
 void IConsole_Command::add_to_LRU(shared_str const& arg)
@@ -290,16 +289,6 @@ void CCC_LoadCFG::Execute(LPCSTR args)
 	}
 }
 
-CCC_LoadCFG_custom::CCC_LoadCFG_custom(LPCSTR cmd)
-	:CCC_LoadCFG(cmd)
-{
-	xr_strcpy(m_cmd, cmd);
-};
-bool CCC_LoadCFG_custom::allow(LPCSTR cmd)
-{
-	return (cmd == strstr(cmd, m_cmd));
-};
-
 //-----------------------------------------------------------------------
 class CCC_Start : public IConsole_Command
 {
@@ -475,6 +464,7 @@ public:
 };
 
 //-----------------------------------------------------------------------
+
 float ps_gamma = 1.f, ps_brightness = 1.f, ps_contrast = 1.f;
 class CCC_Gamma : public CCC_Float
 {
@@ -496,106 +486,7 @@ public:
 };
 
 //-----------------------------------------------------------------------
-/*
-#ifdef DEBUG
-extern INT g_bDR_LM_UsePointsBBox;
-extern INT g_bDR_LM_4Steps;
-extern INT g_iDR_LM_Step;
-extern Fvector g_DR_LM_Min, g_DR_LM_Max;
 
-class CCC_DR_ClearPoint : public IConsole_Command
-{
-public:
-CCC_DR_ClearPoint(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-virtual void Execute(LPCSTR args) {
-g_DR_LM_Min.x = 1000000.0f;
-g_DR_LM_Min.z = 1000000.0f;
-
-g_DR_LM_Max.x = -1000000.0f;
-g_DR_LM_Max.z = -1000000.0f;
-
-Msg("Local BBox (%f, %f) - (%f, %f)", g_DR_LM_Min.x, g_DR_LM_Min.z, g_DR_LM_Max.x, g_DR_LM_Max.z);
-}
-};
-
-class CCC_DR_TakePoint : public IConsole_Command
-{
-public:
-CCC_DR_TakePoint(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-virtual void Execute(LPCSTR args) {
-Fvector CamPos = Device.camera.position;
-
-if (g_DR_LM_Min.x > CamPos.x) g_DR_LM_Min.x = CamPos.x;
-if (g_DR_LM_Min.z > CamPos.z) g_DR_LM_Min.z = CamPos.z;
-
-if (g_DR_LM_Max.x < CamPos.x) g_DR_LM_Max.x = CamPos.x;
-if (g_DR_LM_Max.z < CamPos.z) g_DR_LM_Max.z = CamPos.z;
-
-Msg("Local BBox (%f, %f) - (%f, %f)", g_DR_LM_Min.x, g_DR_LM_Min.z, g_DR_LM_Max.x, g_DR_LM_Max.z);
-}
-};
-
-class CCC_DR_UsePoints : public CCC_Integer
-{
-public:
-CCC_DR_UsePoints(LPCSTR N, int* V, int _min=0, int _max=999) : CCC_Integer(N, V, _min, _max) {};
-virtual void Save (IWriter *F) {};
-};
-#endif
-*/
-
-ENGINE_API BOOL r2_sun_static = TRUE;
-ENGINE_API BOOL r2_advanced_pp = FALSE; // advanced post process and effects
-
-u32 renderer_value = 3;
-//void fill_render_mode_list();
-//void free_render_mode_list();
-
-class CCC_r2 : public CCC_Token
-{
-	typedef CCC_Token inherited;
-public:
-	CCC_r2(LPCSTR N) :inherited(N, &renderer_value, NULL) { renderer_value = 3; };
-	virtual ~CCC_r2()
-	{
-		//free_render_mode_list();
-	}
-	virtual void Execute(LPCSTR args)
-	{
-		//fill_render_mode_list ();
-		// vid_quality_token must be already created!
-		tokens = vid_quality_token;
-
-		inherited::Execute(args);
-		// 0 - r1
-		// 1..3 - r2
-		// 4 - r3
-		psDeviceFlags.set(rsR2, ((renderer_value > 0) && renderer_value < 4));
-		psDeviceFlags.set(rsR3, (renderer_value == 4));
-		psDeviceFlags.set(rsR4, (renderer_value >= 5));
-
-		r2_sun_static = (renderer_value < 2);
-
-		r2_advanced_pp = (renderer_value >= 3);
-	}
-
-	virtual void Save(IWriter* F)
-	{
-		//fill_render_mode_list ();
-		tokens = vid_quality_token;
-		if (!strstr(Core.Params, "-r2"))
-		{
-			inherited::Save(F);
-		}
-	}
-	virtual xr_token* GetToken()
-	{
-		tokens = vid_quality_token;
-		return inherited::GetToken();
-	}
-
-};
-#ifndef DEDICATED_SERVER
 class CCC_soundDevice : public CCC_Token
 {
 	typedef CCC_Token inherited;
@@ -631,7 +522,7 @@ public:
 		inherited::Save(F);
 	}
 };
-#endif
+
 //-----------------------------------------------------------------------
 class CCC_ExclusiveMode : public IConsole_Command
 {
@@ -829,8 +720,6 @@ void CCC_Register()
 	// Camera
 	CMD2(CCC_Float, "cam_inert", &psCamInert);
 	CMD2(CCC_Float, "cam_slide_inert", &psCamSlideInert);
-
-	CMD1(CCC_r2, "renderer");
 
 #ifndef DEDICATED_SERVER
 	CMD1(CCC_soundDevice, "snd_device");

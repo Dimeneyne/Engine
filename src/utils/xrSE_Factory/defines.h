@@ -1,5 +1,4 @@
-#ifndef DefinesH
-#define DefinesH
+#pragma once
 
 #ifdef	DEBUG
 	ENGINE_API	extern BOOL			bDebug;
@@ -36,7 +35,6 @@ enum {
 	mtParticles						= (1ul<<16ul),
 
 	rsCameraPos						= (1ul<<17ul),
-	rsR2							= (1ul<<18ul),
 
 	// 20-32 bit - reserved to Editor
 };
@@ -69,5 +67,3 @@ ENGINE_API extern	Flags32		psDeviceFlags		;
 #define _omotions_			    "$omotions$"
 #define _smotion_			    "$smotion$"
 #define _detail_objects_	    "$detail_objects$"
-
-#endif
