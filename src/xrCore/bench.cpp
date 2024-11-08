@@ -45,15 +45,16 @@ void aBench::flushStatistics()
 	for (auto& data : statistics)
 	{
 		float sum_time					= data->sum_time * 1000.f;
-		float avg_time					= sum_time / static_cast<float>(data->cnt);
-		float avg_per_frame				= sum_time / static_cast<float>(data->frames);
-		Msg								("--benchmark [%s] sum [%.3f] cnt [%d] frames [%d] avg [%.3f] avg per frame [%.3f]",
-			data->tag.c_str(),
-			sum_time,
-			data->cnt,
-			data->frames,
-			avg_time,
-			avg_per_frame
+		float fcnt						= static_cast<float>(data->cnt);
+		float fframes					= static_cast<float>(data->frames);
+
+		float calls_per_frame			= fcnt / fframes;
+		float time_per_call				= sum_time / fcnt;
+		float time_per_frame			= sum_time / fframes;
+
+		Msg								(
+			"--benchmark [%s] sum [%.3f] cnt [%d] frames [%d] calls per frame [%.3f] time per call [%.3f] time per frame [%.3f]",
+			data->tag.c_str(), sum_time, data->cnt, data->frames, calls_per_frame, time_per_call, time_per_frame
 		);
 	}
 }
