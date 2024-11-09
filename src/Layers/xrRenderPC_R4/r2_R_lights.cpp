@@ -9,6 +9,11 @@ IC		bool	pred_area		(light* _1, light* _2)
 
 void	CRender::render_lights	(light_Package& LP)
 {
+	BENCH;
+
+	if (Device.isGameProcess())
+		Msg("--xd LP.v_shadowed came [%d]", LP.v_shadowed.size());
+
 	//////////////////////////////////////////////////////////////////////////
 	// Refactor order based on ability to pack shadow-maps
 	// 1. calculate area + sort in descending order
@@ -18,7 +23,7 @@ void	CRender::render_lights	(light_Package& LP)
 		for (u32 it=0; it<source.size(); it++)
 		{
 			light*	L		= source[it];
-			L->vis_update	();
+			BENCH_FUN(L->vis_update	())
 			if	(!L->vis.visible)	{
 				source.erase		(source.begin()+it);
 				it--;
@@ -27,6 +32,9 @@ void	CRender::render_lights	(light_Package& LP)
 			}
 		}
 	}
+
+	if (Device.isGameProcess())
+		Msg("--xd LP.v_shadowed active [%d]", LP.v_shadowed.size());
 
 	// 2. refactor - infact we could go from the backside and sort in ascending order
 	{
@@ -89,6 +97,8 @@ void	CRender::render_lights	(light_Package& LP)
 		u16			sid		= L->vis.smap_ID	;
 		while (true)	
 		{
+			BENCH_TAG("processing lights average");
+
 			if	(source.empty())		break;
 			L	= source.back			();
 			if	(L->vis.smap_ID!=sid)	break;
@@ -118,7 +128,7 @@ void	CRender::render_lights	(light_Package& LP)
 					Target->phase_smap_spot_tsh			(L);
                PIX_EVENT(SHADOWED_LIGHTS_RENDER_GRAPH);
 					r_dsgraph_render_graph				(1);			// normal level, secondary priority
-               PIX_EVENT(SHADOWED_LIGHTS_RENDER_SORTED);
+					PIX_EVENT(SHADOWED_LIGHTS_RENDER_SORTED);
 					r_dsgraph_render_sorted				( );			// strict-sorted geoms
 				}
 			} else {
