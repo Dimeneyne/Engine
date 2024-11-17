@@ -772,6 +772,7 @@ void player_hud::detach_item_idx(u16 idx)
 	auto& hi							= m_attached_items[idx];
 	hi->m_parent_hud_item->on_b_hud_detach();
 	hi->m_parent_hud_item				= nullptr;
+	m_pool.erase_data					(hi);
 	hi									= nullptr;
 
 	if (idx == 1)
