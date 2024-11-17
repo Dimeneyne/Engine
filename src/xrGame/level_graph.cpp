@@ -207,13 +207,13 @@ u32 CLevelGraph::vertex		(u32 current_node_id, const Fvector& position) const
 
 u32	CLevelGraph::vertex_id				(const Fvector &position) const
 {
-	VERIFY2				(
+	/* --xd bloat VERIFY2(
 		valid_vertex_position(position),
 		make_string(
 			"invalid position for CLevelGraph::vertex_id specified: [%f][%f][%f]",
 			VPUSH(position)
 		)
-	);
+	);*/
 
 	CPosition			_vertex_position = vertex_position(position);
 	CVertex				*B = m_nodes;
