@@ -183,6 +183,8 @@ void CBulletManager::Load()
 	LPCSTR explode_particles			= pSettings->r_string(bullet_manager_sect, "explode_particles");
 	for (int k = 0, cnt = _GetItemCount(explode_particles); k < cnt; ++k)
 		m_ExplodeParticles.push_back	(_GetItem(explode_particles, k, tmp));
+
+	perform_aboba();
 }
 
 void CBulletManager::PlayExplodePS( const Fmatrix& xf )
@@ -569,4 +571,54 @@ float CBulletManager::CalcZeroingCorrection(float k, float z) const
 float CBulletManager::calculateAP(float penetration, float speed) const
 {
 	return								m_global_ap_scale * penetration * logf(1.f + .00000055f * _sqr(speed));
+}
+
+#include "items_library.h"
+#include "BoneProtections.h"
+#include "EntityCondition.h"
+#include <fstream>
+void CBulletManager::perform_aboba()
+{
+	std::ofstream output;
+	output.open("C:\\tmp.txt");
+	shared_str str;
+
+	for (auto& sect : CItemsLibrary::getDivision("ammo", "cartridge", "void"))
+	{
+		auto cartridge = CCartridge(sect.c_str());
+		if (cartridge.m_flags.test(CCartridge::cfTracer))
+			continue;
+
+		float bullet_speed = cartridge.param_s.bullet_speed_per_barrel_len * cartridge.param_s.barrel_len;
+		float bullet_ap = calculateAP(cartridge.param_s.penetration, bullet_speed);
+
+		SBullet bullet;
+		bullet.Init(vZero, vForward, cartridge.param_s.barrel_len, 0, 0, ALife::eHitTypeFireWound, 0.f, cartridge, false, -1.f, -1.f);
+
+		str.printf("======================================== %s [%.3f]", CInventoryItem::readName(sect), bullet_ap);
+		output << str.c_str() << std::endl;
+
+		for (int i = -1; i < 11; ++i)
+		{
+			float armor = (i >= 0) ? SBoneProtections::s_armor_levels[i] : 0;
+			SBullet_Hit hit;
+			calculate_hit_damage(bullet_ap, armor, 5.f, hit, &SBullet(bullet));
+
+			float full_main_damage = hit.main_damage;
+			hit.main_damage -= min(hit.main_damage, CEntityCondition::StrikeDamageThreshold.Calc(armor));
+			if (fMore(hit.main_damage, 0.f))
+				hit.main_damage /= (1.f + CEntityCondition::StrikeDamageResistance.Calc(armor));
+
+			if (fIsZero(hit.pierce_damage))
+				str.printf("ARMOR LEVEL %2d [%3.0f] MAIN DAMAGE [%.3f]-[%.3f] PIERCE DAMAGE [---] FULL_DAMAGE [%.3f] HITS TO KILL [%.3f]",
+					i, armor, full_main_damage, hit.main_damage, hit.main_damage, 1.f / hit.main_damage);
+			else
+			{
+				float full_damage = hit.main_damage + hit.pierce_damage;
+				str.printf("ARMOR LEVEL %2d [%3.0f] MAIN DAMAGE [%.3f]-[%.3f] PIERCE DAMAGE [%.3f] FULL_DAMAGE [%.3f] HITS TO KILL [%.3f]",
+					i, armor, full_main_damage, hit.main_damage, hit.pierce_damage, full_damage, 1.f / full_damage);
+			}
+			output << str.c_str() << std::endl;
+		}
+	}
 }

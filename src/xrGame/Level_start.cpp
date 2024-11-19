@@ -244,7 +244,7 @@ bool CLevel::net_start6				()
 {
 	//init bullet manager
 	BulletManager().Clear		();
-	BulletManager().Load		();
+	//BulletManager().Load		();
 
 	pApp->LoadEnd				();
 

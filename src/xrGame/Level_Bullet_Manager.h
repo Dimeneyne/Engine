@@ -229,6 +229,8 @@ private:
 		float k_speed_in = 0.f, float k_speed_out = 0.f, bool inwards = true
 	) const;
 
+	void perform_aboba();
+
 public:
 	float								m_fBulletAirResistanceScale;
 	float								m_fBulletWallMarkSizeScale;

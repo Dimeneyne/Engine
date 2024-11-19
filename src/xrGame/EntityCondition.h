@@ -249,8 +249,6 @@ private:
 	static float						m_fMeleeOnPierceDamageMultiplier;
 	static float						m_fMeleeOnPierceArmorDamageFactor;
 
-	static CPowerDependency				StrikeDamageThreshold;
-	static CPowerDependency				StrikeDamageResistance;
 	static CPowerDependency				ExplDamageResistance;
 	static CPowerDependency				ArmorDamageResistance;
 
@@ -265,5 +263,7 @@ private:
 
 
 public:
+	static CPowerDependency				StrikeDamageThreshold;
+	static CPowerDependency				StrikeDamageResistance;
 	static void							loadStaticData							();
 };

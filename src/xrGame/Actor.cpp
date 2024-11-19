@@ -411,26 +411,26 @@ void CActor::Load(LPCSTR section)
 			LPCSTR hit_name = ALife::g_cafHitType2String(static_cast<ALife::EHitType>(hit_type));
 			if (auto hit_snds = pSettings->r_string_ex(hit_snd_sect, hit_name, 0))
 			{
-				int cnt = _GetItemCount(hit_snds);
-				string128		tmp;
-				VERIFY(cnt != 0);
-				for (int i = 0; i < cnt; ++i)
-				{
-					sndHit[hit_type].push_back(ref_sound());
-					sndHit[hit_type].back().create(_GetItem(hit_snds, i, tmp), st_Effect, sg_SourceType);
-				}
-				char buf[256];
-
-				::Sound->create(sndDie[0], strconcat(sizeof(buf), buf, *cName(), "\\die0"), st_Effect, SOUND_TYPE_MONSTER_DYING);
-				::Sound->create(sndDie[1], strconcat(sizeof(buf), buf, *cName(), "\\die1"), st_Effect, SOUND_TYPE_MONSTER_DYING);
-				::Sound->create(sndDie[2], strconcat(sizeof(buf), buf, *cName(), "\\die2"), st_Effect, SOUND_TYPE_MONSTER_DYING);
-				::Sound->create(sndDie[3], strconcat(sizeof(buf), buf, *cName(), "\\die3"), st_Effect, SOUND_TYPE_MONSTER_DYING);
-
-				m_HeavyBreathSnd.create(pSettings->r_string(section, "heavy_breath_snd"), st_Effect, SOUND_TYPE_MONSTER_INJURING);
-				m_BloodSnd.create(pSettings->r_string(section, "heavy_blood_snd"), st_Effect, SOUND_TYPE_MONSTER_INJURING);
-				m_DangerSnd.create(pSettings->r_string(section, "heavy_danger_snd"), st_Effect, SOUND_TYPE_MONSTER_INJURING);
+			int cnt = _GetItemCount(hit_snds);
+			string128		tmp;
+			VERIFY(cnt != 0);
+			for (int i = 0; i < cnt; ++i)
+			{
+				sndHit[hit_type].push_back(ref_sound());
+				sndHit[hit_type].back().create(_GetItem(hit_snds, i, tmp), st_Effect, sg_SourceType);
 			}
+			char buf[256];
+
+			::Sound->create(sndDie[0], strconcat(sizeof(buf), buf, *cName(), "\\die0"), st_Effect, SOUND_TYPE_MONSTER_DYING);
+			::Sound->create(sndDie[1], strconcat(sizeof(buf), buf, *cName(), "\\die1"), st_Effect, SOUND_TYPE_MONSTER_DYING);
+			::Sound->create(sndDie[2], strconcat(sizeof(buf), buf, *cName(), "\\die2"), st_Effect, SOUND_TYPE_MONSTER_DYING);
+			::Sound->create(sndDie[3], strconcat(sizeof(buf), buf, *cName(), "\\die3"), st_Effect, SOUND_TYPE_MONSTER_DYING);
+
+			m_HeavyBreathSnd.create(pSettings->r_string(section, "heavy_breath_snd"), st_Effect, SOUND_TYPE_MONSTER_INJURING);
+			m_BloodSnd.create(pSettings->r_string(section, "heavy_blood_snd"), st_Effect, SOUND_TYPE_MONSTER_INJURING);
+			m_DangerSnd.create(pSettings->r_string(section, "heavy_danger_snd"), st_Effect, SOUND_TYPE_MONSTER_INJURING);
 		}
+	}
 	}
 	
 	//Alundaio -psp always
@@ -1775,4 +1775,5 @@ void CActor::loadStaticData()
 	CObject::loadStaticData				();
 	InventoryUtilities::loadStaticData	();
 	CCustomZone::loadStaticData			();
+	Level().BulletManager().Load		();
 }
