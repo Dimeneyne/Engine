@@ -492,6 +492,9 @@ void CInput::MouseUpdate()
 		if (timeStamp[0] && ((dwCurTime - timeStamp[0]) >= mouse_property.mouse_dt)) cbStack.back()->IR_OnMouseStop(DIMOFS_X, timeStamp[0] = 0);
 	}
 
+	if (!Device.b_is_Ready)
+		return;
+
 	GetCursorPos(&mouse_point);
 	if (mouse_point.x < screen_rect.left || mouse_point.x > screen_rect.right ||
 		mouse_point.y < screen_rect.top || mouse_point.y > screen_rect.bottom)
